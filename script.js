@@ -57,3 +57,31 @@ form.addEventListener("submit",function(e){e.preventDefault();var bad=false;
   .then(function(r){if(!r.ok)throw new Error(r.status);form.reset();show(true,"Thank you. Your enquiry has been sent. We will be in touch.")})
   .catch(function(){show(false,"Sorry, your enquiry could not be sent. Please try again or contact us directly.")})
   .finally(function(){b.disabled=false;b.textContent="Send Enquiry"})});
+
+
+/* ---------- Search ---------- */
+/* To make a new product findable, add its name to the "k" keywords of its category. */
+var SEARCH_INDEX=[
+ {t:"Bedroom Suites",u:"bedroom-suites.html",k:"bedroom headboard headboards pedestal pedestals bedside table dresser dressers chest chests mirror mirrors"},
+ {t:"Living Lifestyle",u:"living-lifestyle.html",k:"living lounge tv stand stands coffee table tables"},
+ {t:"Desks",u:"desks.html",k:"desk desks office workspace study"},
+ {t:"Wardrobes",u:"wardrobes.html",k:"wardrobe wardrobes closet storage"},
+ {t:"Kitchen Units",u:"kitchen-units.html",k:"kitchen units cupboard cupboards"},
+ {t:"Bookcases & Bookshelves",u:"bookshelves.html",k:"bookcase bookcases bookshelf bookshelves books shelf shelves"},
+ {t:"Kists",u:"kists.html",k:"kist kists trunk storage box"}];
+(function(){
+ var links=document.querySelector(".links");if(!links)return;
+ var f=document.createElement("form");f.className="search";f.setAttribute("role","search");f.setAttribute("autocomplete","off");
+ f.innerHTML='<button class="search-btn" type="button" aria-label="Search products" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><label class="sr" for="searchInput">Search products</label><input id="searchInput" type="search" placeholder="Search products…"><ul class="results" hidden></ul>';
+ links.insertBefore(f,links.querySelector(".btn"));
+ var btn=f.querySelector(".search-btn"),inp=f.querySelector("input"),ul=f.querySelector(".results");
+ function toggle(o){f.classList.toggle("open",o);btn.setAttribute("aria-expanded",o);if(o)inp.focus();else{inp.value="";ul.hidden=true}}
+ function show(){var q=inp.value.trim().toLowerCase();if(!q){ul.hidden=true;return}
+  var hits=SEARCH_INDEX.filter(function(p){return(p.t+" "+p.k).toLowerCase().indexOf(q)>-1});
+  ul.innerHTML=hits.length?hits.map(function(p){return'<li><a href="'+p.u+'">'+p.t.replace(/&/g,"&amp;")+'</a></li>'}).join(""):'<li class="none">No products found</li>';ul.hidden=false}
+ btn.addEventListener("click",function(){toggle(!f.classList.contains("open"))});
+ inp.addEventListener("input",show);
+ f.addEventListener("submit",function(e){e.preventDefault();var a=ul.querySelector("a");if(a)location.href=a.getAttribute("href")});
+ document.addEventListener("keydown",function(e){if(e.key==="Escape")toggle(false)});
+ document.addEventListener("click",function(e){if(!f.contains(e.target))toggle(false)});
+})();
